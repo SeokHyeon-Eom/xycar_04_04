@@ -1,4 +1,3 @@
-
 class MovingAverage:
     def __init__(self, n):
         self.samples = n
