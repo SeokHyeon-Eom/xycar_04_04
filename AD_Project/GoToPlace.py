@@ -4,6 +4,7 @@ from linedetector import LineDetector
 from obstacledetector import ObstacleDetector
 from motordriver import MotorDriver
 import ultrasonic
+import recognize_bar
 
 
 class GoToPlace:
@@ -14,6 +15,7 @@ class GoToPlace:
         self.obstacle_detector = ObstacleDetector('/ultrasonic')
         self.driver = MotorDriver('/xycar_motor_msg')
         self.obstacle = ultrasonic.obstacle_detect()
+        self.recognize = recognize_bar.isbreaker
 
     def trace(self):
         obs_l, obs_m, obs_r = self.obstacle_detector.get_distance()
@@ -65,11 +67,13 @@ class GoToPlace:
 
 
     #ultrasonic에서 true 리턴해주면 운전 멈추도록
-    def stopsign(self, obstacle):
+    def stopsign(self, obstacle, recognize):
         obstacle = self.obstacle
-        if obstacle == True:
+        recognize = self.recognize
+        if obstacle == recognize == True:
             speed = 0
             return speed
+    
 
 
 
