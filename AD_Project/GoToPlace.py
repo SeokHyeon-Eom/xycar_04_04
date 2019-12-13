@@ -5,6 +5,7 @@ from obstacledetector import ObstacleDetector
 from motordriver import MotorDriver
 import ultrasonic
 import recognize_bar
+import 
 
 
 class GoToPlace:
@@ -16,6 +17,7 @@ class GoToPlace:
         self.driver = MotorDriver('/xycar_motor_msg')
         self.obstacle = ultrasonic.obstacle_detect()
         self.recognize = recognize_bar.isbreaker
+
 
     def trace(self):
         obs_l, obs_m, obs_r = self.obstacle_detector.get_distance()
@@ -73,7 +75,17 @@ class GoToPlace:
         if obstacle == recognize == True:
             speed = 0
             return speed
-    
+
+    #left인지 right인지 direction 변수를 통해 받아왔다 치고
+    def determine(self, direction):
+        direction = self.direction
+        if direction == "left":
+            angle = -40
+        if direction == "right":
+            angle = 40
+
+        return angle
+
 
 
 
