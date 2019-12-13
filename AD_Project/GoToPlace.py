@@ -3,6 +3,7 @@ import rospy, time
 from linedetector import LineDetector
 from obstacledetector import ObstacleDetector
 from motordriver import MotorDriver
+import ultrasonic
 
 
 class GoToPlace:
@@ -12,6 +13,7 @@ class GoToPlace:
         self.line_detector = LineDetector('/usb_cam/image_raw')
         self.obstacle_detector = ObstacleDetector('/ultrasonic')
         self.driver = MotorDriver('/xycar_motor_msg')
+        self.obstacle = ultrasonic.obstacle_detect()
 
     def trace(self):
         obs_l, obs_m, obs_r = self.obstacle_detector.get_distance()
@@ -60,6 +62,16 @@ class GoToPlace:
 #받아온 왼/오 canny와 인식한 왼/오 픽셀값이 일치 시 true를 리턴
         if left == pixel_left and right == pixel_right:
             return True
+
+
+    #ultrasonic에서 true 리턴해주면 운전 멈추도록
+    def stopsign(self, obstacle):
+        obstacle = self.obstacle
+        if obstacle == True:
+            speed = 0
+            return speed
+
+
 
     def exit(self):
         print('finished')
