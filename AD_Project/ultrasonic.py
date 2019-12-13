@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy, time
+import rospy
 from std_msgs.msg import Int32MultiArray
 from filter import MovingAverage
 # 이미지를 받아오고서 차단기를 인식하면 True를 출력해서 True이면 실행하도록
@@ -19,6 +19,13 @@ class ultrasonic:
         motor_pub = rospy.Publisher('xycar_motor_msg',
                                     Int32MultiArray, queue_size=1)
 
+        rate = rospy.sleep(10)
+        self.ma = MovingAverage(10)
+        # 일단 초반 10개 값은 받고
+        while len(self.ma.data) <= 10:
+            self.ma.add_sample(usonic_data[1])
+            rate.sleep()
+            
     def exit_node(self):
         return
 
@@ -34,25 +41,21 @@ class ultrasonic:
 
     # 여기서는 앞에 방해물이 있으면 True를 리턴하도록
     def obstruction_detect(self):
-        ma = MovingAverage(10)
         rate = rospy.Rate(10)
-
-        # 일단 초반 10개 값은 받고
-        while len(ma.data) <= 10:
-            ma.add_sample(usonic_data[1])
-            rate.sleep()
 
         # 그 다음부터 튀는값 제거
         # 평균의 5정도 사이가 아니라면 무시
         while True:
             # 평균값 근처
-            if ma.getmm - 5 < usonic_data[1] < ma.getmm + 5:
-                ma.add_sample(usonic_data[1])
+            if self.ma.getmm - 5 < usonic_data[1] < ma.getmm + 5:
+                self.ma.add_sample(usonic_data[1])
 
             # 튀는값이 나오면 리스트의 맨 마지막 값을 추가
             else:
-                ma.add_sample(ma.data[-1])
+                self.ma.add_sample(self.ma.data[-1])
+
             rate.sleep()
+            print(self.ma.data)
 
             # 장애물 탐지
             if usonic_data[1] < 30 and (ma.getmm - 5 < usonic_data[1] < ma.getmm + 5):
