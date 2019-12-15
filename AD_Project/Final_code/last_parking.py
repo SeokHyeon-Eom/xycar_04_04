@@ -15,7 +15,7 @@ class AutoDrive:
         rospy.init_node('xycar_driver')
         self.line_detector = LineDetector('/usb_cam/image_raw')
         self.obstacle_detector = ObstacleDetector('/ultrasonic')
-	self.ultra = ultrasonic()
+	    self.ultra = ultrasonic()
         self.driver = MotorDriver('/xycar_motor_msg')
         self.cnt = 0
         self.ob = False
@@ -29,21 +29,19 @@ class AutoDrive:
 
     def trace(self):
         obs_l, obs_m, obs_r = self.obstacle_detector.get_distance()
-        # line_l, line_r, fix_left, fix_right, check = self.line_detector.detect_lines()
-        # self.line_detector.show_images(line_l, line_r)
-        # angle = self.steer(line_l, line_r, fix_left, fix_right, check)
-        # speed = self.accelerate(angle, obs_l, obs_m, obs_r, check)
         angle = 0
-        print(obs_m)
-        if obs_m < 40 and not self.ob: #and self.line_detector.check():
+
+        if obs_m < 40 and not self.obn and self.line_detector.check():
             self.ob = True
             self.cnt = 1
             speed = 0
         speed = self.accelerate(obs_l, obs_m, obs_r)
+        
         if self.cnt == 1 and obs_m > 50:
             self.direct = self.line_detector.recognition()
             print(self.direct)
             speed = 0
+        
         if self.direct == "right":
             angle = self.turn_right()
         elif self.direct == "left":
@@ -65,10 +63,10 @@ class AutoDrive:
             return 0
 
     def turn_left(self):
-        if self.cnt < 25:
+        if self.cnt < 20:
             self.cnt += 1
             return -30
-        elif self.cnt < 42:
+        elif self.cnt < 35:
             self.cnt += 1
             return 30
         else:
