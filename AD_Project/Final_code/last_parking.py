@@ -68,7 +68,7 @@ class AutoDrive:
             return -30
         elif self.cnt < 35:
             self.cnt += 1
-            return 30
+            return 20
         else:
             return 0
 
